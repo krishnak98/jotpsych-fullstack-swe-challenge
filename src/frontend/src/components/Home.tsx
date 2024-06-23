@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import APIService from "../services/APIService";
 
 function Home() {
   const [username, setUsername] = useState<string>("");
@@ -7,6 +8,7 @@ function Home() {
   useEffect(() => {
     const fetchUser = async () => {
       // get access token
+      var token = localStorage.getItem('token')
 
       if (token) {
         const response = await fetch("http://localhost:3002/user", {
@@ -23,6 +25,23 @@ function Home() {
 
     fetchUser();
   }, []);
+
+
+// const fetchUser = async () => {
+//   const token = localStorage.getItem('token');
+//   if (token) {
+//       try {
+//           const data = await APIService.request('/user', 'GET', {},true)
+//           setUsername(data.username);
+//       } catch (error) {
+//           console.error('Error fetching user:', error);
+//       }
+//   }
+// };
+
+// useEffect(() => {
+//   fetchUser();
+// }, []);
 
   return (
     <div>

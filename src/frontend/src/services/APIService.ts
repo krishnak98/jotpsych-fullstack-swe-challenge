@@ -25,9 +25,13 @@ class APIService {
       "Content-Type": "application/json",
       "app-version": this.appVersion,
     };
-
+    console.log("inside request")
+    console.log(auth)
     if (auth) {
+      console.log("Inside auth")
       // get access token somehow
+      var token = localStorage.getItem('token')
+      console.log(token)
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }

@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import { TextField, Button, Typography, Container } from '@mui/material';
+
+
+// redirect to login? 
 
 function Register() {
   const [username, setUsername] = useState<string>("");
@@ -19,29 +23,43 @@ function Register() {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
+    <Container maxWidth="sm">
+      <Typography variant="h4" component="h2" gutterBottom>
+        Register
+      </Typography>
       <form onSubmit={handleRegister}>
         <div>
-          <label>Username:</label>
-          <input
+          <TextField
+            label="Username"
             type="text"
+            fullWidth
+            margin="normal"
+            variant="outlined"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
         </div>
         <div>
-          <label>Password:</label>
-          <input
+          <TextField
+            label="Password"
             type="password"
+            fullWidth
+            margin="normal"
+            variant="outlined"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit">Register</button>
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          Register
+        </Button>
       </form>
-      {message && <p>{message}</p>}
-    </div>
+      {message && (
+        <Typography variant="body2" color="error" marginTop="16px">
+          {message}
+        </Typography>
+      )}
+    </Container>
   );
 }
 
