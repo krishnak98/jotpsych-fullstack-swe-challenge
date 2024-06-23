@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { TextField, Button, Typography, Container } from '@mui/material';
+import { TextField, Button, Typography, Container, Link} from '@mui/material';
 import APIService from "../services/APIService";
+import { useNavigate } from 'react-router-dom';
+
 
 
 // add redirection on sucessful login
@@ -30,16 +32,19 @@ function Login() {
   //   }
   // };
 
+  const navigate = useNavigate();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const data = await APIService.request('/login', 'POST', { username, password });
       
-      // Assuming the response contains an access token
       localStorage.setItem('token', data.token);
   
       setMessage("Login successful");
-    } catch (error) {
+      navigate('/profile');
+  
+    } catch (error: any) {
       setMessage(error.message || "An error occurred");
     }
   };
@@ -80,6 +85,10 @@ function Login() {
           {message}
         </Typography>
       )}
+      <Typography variant="body2" marginTop="16px">
+        Don't have an account? <Link href="/register">Register</Link>
+      </Typography>
+
     </Container>
   );
 }

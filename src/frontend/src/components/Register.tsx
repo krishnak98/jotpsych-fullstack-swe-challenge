@@ -1,25 +1,43 @@
 import React, { useState } from "react";
 import { TextField, Button, Typography, Container } from '@mui/material';
-
-
-// redirect to login? 
+import APIService from "../services/APIService";
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [message, setMessage] = useState<string>("");
 
+  // const handleRegister = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   const response = await fetch("http://localhost:3002/register", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ username, password }),
+  //   });
+  //   const data = await response.json();
+  //   setMessage(data.message);
+  //   if data
+  // };
+
+  const navigate = useNavigate();
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:3002/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
-    const data = await response.json();
-    setMessage(data.message);
+    try {
+      const resp = await APIService.request('/register', 'POST', { username, password });
+      if (resp.status === 201) {
+        setMessage("Registration successful");
+        navigate('/login');
+      } else {
+        setMessage("Failed to register user");
+      }
+
+  
+    } catch (error: any) {
+      setMessage(error.message || "An error occurred");
+    }
   };
 
   return (
