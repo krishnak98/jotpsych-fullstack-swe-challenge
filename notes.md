@@ -14,3 +14,10 @@ Audio Recording
 I updated the Profile page to handle mediaRecordings as well. When the recording button is clicked twice, it stops recording and calls the /upload function, and sends the audio blob, and the username in the request. Here also, I am not using the APIService method, and that needs to be updated. 
 
 In app.py, I just created a VERY BASIC dummy function which transcribes the audio and returns some string, with the random waiting. I saved the text to the DB as the users motto, but wasn't able to find time to update it in the profile page in the frontend.
+
+
+------------------------------------
+This is after the submission.
+
+# Update 1: 
+updated register to use APIService; and added routes from register to login, login to profile, profile to logout

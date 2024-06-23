@@ -48,7 +48,7 @@ def create_app():
         new_user = User(username=data['username'], password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
-        return jsonify({'message': 'User registered successfully'}), 201
+        return jsonify({'message': 'User registered successfully', 'status':201}), 201
 
     @app.route('/login', methods=['POST'])
     def login():
