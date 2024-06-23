@@ -38,3 +38,4 @@ Moved AudioRecorder parts to different typescript file
 Improvements to be done: 
 1. Fix CORS issue in /upload
 2. Add a token blacklist on the backend? (Need to read more about this)
+3. Improve error messages when register and login fail
