@@ -27,3 +27,7 @@ Changed to APIService calls.
 
 # Update 3: 
 Minor improvements, added motto to the db, updated user profile to display self recorded audio
+Upload is still causing some CORS issue, so haven't used APIService for /upload endpoint
+Encryption and decryption of user's motto is complete. 
+I'm hardcoding a key, so that key is same across server restarts. Need to think of a better method for this.
+

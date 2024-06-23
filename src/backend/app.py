@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
+from cryptography.fernet import Fernet
+
 import time
 import random
 
@@ -12,6 +14,11 @@ import os
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 jwt = JWTManager()
+
+# TODO: fix the key, so that even on restarting server, we can use the same key 
+#https://stackoverflow.com/questions/27335726/how-do-i-encrypt-and-decrypt-a-string-in-python
+key = b'mc2Qxu5zfvXxb0Ht699b3KFihYt54xOq9V1hHABzhLY='
+cipher = Fernet(key)
 
 
 def create_app():
@@ -95,10 +102,15 @@ def create_app():
         current_user = get_jwt_identity()
         user = User.query.filter_by(username=current_user['username']).first()
         if user:
+            if user.motto:
+                motto = cipher.decrypt(user.motto).decode('utf-8')
+            else:
+                motto = None
+
             user_info = {
                 'username': user.username,
                 'id': user.id,
-                'motto': user.motto
+                'motto': motto
             }
             return user_info, 200
         else:
@@ -110,14 +122,17 @@ def create_app():
         data = request.files['audio']
         username = request.form['username']
         transcript = transcribe_audio(data)
+        print(transcript)
+        enc_transcript = cipher.encrypt(transcript.encode('utf-8'))
+        print(enc_transcript)
         user = User.query.filter_by(username=username).first()
-        user.motto = transcript
+        user.motto = enc_transcript
         db.session.commit()
         return jsonify({'data':transcript}), 200
         
     def transcribe_audio(data):
         # Simulate transcript
-        delay = random.randint(1,2) # 5 to 15 is too long
+        delay = random.randint(1,2) # 5 to 15 is too long to test
         time.sleep(delay)  
         transcript = "Sample motto"
         return transcript
