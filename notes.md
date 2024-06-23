@@ -35,3 +35,6 @@ I'm hardcoding a key, so that key is same across server restarts. Need to think 
 
 Moved AudioRecorder parts to different typescript file
 
+Improvements to be done: 
+1. Fix CORS issue in /upload
+2. Add a token blacklist on the backend? (Need to read more about this)
