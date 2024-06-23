@@ -5,43 +5,22 @@ import APIService from "../services/APIService";
 function Home() {
   const [username, setUsername] = useState<string>("");
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      // get access token
-      var token = localStorage.getItem('token')
 
-      if (token) {
-        const response = await fetch("http://localhost:3002/user", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        if (response.ok) {
+const fetchUser = async () => {
+  const token = localStorage.getItem('token');
+  if (token) {
+      try {
+          const data = await APIService.request('/user', 'GET',null,true)
           setUsername(data.username);
-        }
+      } catch (error) {
+          console.error('Error fetching user:', error);
       }
-    };
+  }
+};
 
-    fetchUser();
-  }, []);
-
-
-// const fetchUser = async () => {
-//   const token = localStorage.getItem('token');
-//   if (token) {
-//       try {
-//           const data = await APIService.request('/user', 'GET', {},true)
-//           setUsername(data.username);
-//       } catch (error) {
-//           console.error('Error fetching user:', error);
-//       }
-//   }
-// };
-
-// useEffect(() => {
-//   fetchUser();
-// }, []);
+useEffect(() => {
+  fetchUser();
+}, []);
 
   return (
     <div>

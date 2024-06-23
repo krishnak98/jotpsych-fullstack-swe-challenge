@@ -26,6 +26,7 @@ def create_app():
         resources={r"*": {"origins": ["*"]}},
         allow_headers=["Authorization", "Content-Type","app-version"],
         methods=["GET", "POST", "OPTIONS"],
+        supports_credentials=True,
         max_age=86400
     )
 
@@ -42,6 +43,8 @@ def create_app():
 
     @app.route('/register', methods=['POST'])
     def register():
+        if version_check(request):
+            return jsonify({'message': 'Invalid version'}), 200
         data = request.get_json()
         hashed_password = bcrypt.generate_password_hash(
             data['password']).decode('utf-8')
@@ -50,8 +53,24 @@ def create_app():
         db.session.commit()
         return jsonify({'message': 'User registered successfully', 'status':201}), 201
 
+    def version_check(data):
+        version = request.headers['App-Version']
+        version_parts = version.split('.')
+        target_version = '1.2.0'
+        target_parts = target_version.split('.')
+        
+        for i in range(min(len(version_parts), len(target_parts))):
+            if int(version_parts[i]) < int(target_parts[i]):
+                return True
+            elif int(version_parts[i]) > int(target_parts[i]):
+                return False
+        return False
+
+
     @app.route('/login', methods=['POST'])
     def login():
+        if version_check(request):
+            return jsonify({'message': 'Invalid version'}), 200
         data = request.get_json()
         user = User.query.filter_by(username=data["username"]).first()
         if user and bcrypt.check_password_hash(user.password, data['password']):
@@ -62,41 +81,40 @@ def create_app():
     
     @app.route('/logout', methods=['GET'])
     def logout():
-        print("Inside logout")
-
+        if version_check(request):
+            return jsonify({'message': 'Invalid version'}), 200
         # Maybe add a blacklist? 
         #https://stackoverflow.com/questions/21978658/invalidating-json-web-tokens
-        return jsonify({'message': 'logout successful'}), 200
+        return jsonify({'message': 'logout successful', 'status':200}), 200
 
     @app.route('/user', methods=['GET'])
     @jwt_required()
     def user():
+        if version_check(request):
+            return jsonify({'message': 'Invalid version'}), 200
         current_user = get_jwt_identity()
-        
-        # user = User.query.filter_by(username=current_user).first()
-        # print(user)
-        # user_info = {
-        #     'username': user.username
-        # }
-        # return user information
-        return current_user, 200
+        user = User.query.filter_by(username=current_user['username']).first()
+        if user:
+            user_info = {
+                'username': user.username,
+                'id': user.id,
+                'motto': user.motto
+            }
+            return user_info, 200
+        else:
+            return jsonify({'message': 'invalid login'}), 404
     
 
     @app.route('/upload',methods=['POST'])
     def upload():
-        print("Uploading")
         data = request.files['audio']
         username = request.form['username']
         transcript = transcribe_audio(data)
         user = User.query.filter_by(username=username).first()
         user.motto = transcript
         db.session.commit()
-        return jsonify({'message':'success'}), 200
+        return jsonify({'data':transcript}), 200
         
-        # print(data)
-        # return "",200
-    
-
     def transcribe_audio(data):
         # Simulate transcript
         delay = random.randint(1,2) # 5 to 15 is too long
@@ -116,6 +134,7 @@ class User(db.Model):#
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
+    motto = db.Column(db.String(500), nullable=True)
 
 
 if __name__ == '__main__':

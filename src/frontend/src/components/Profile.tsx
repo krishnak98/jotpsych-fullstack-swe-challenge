@@ -1,25 +1,27 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Typography, Box, Button, Avatar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import APIService from "../services/APIService";
 
 function Profile() {
     const [username, setUsername] = useState<string>("");
+    const [motto, setMotto] = useState<string>("My motto goes here");
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUser = async () => {
             const token = localStorage.getItem('token');
-    
             if (token) {
-                const response = await fetch("http://localhost:3002/user", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    setUsername(data.username);
+                const resp = await APIService.request('/user', 'GET',null,true);
+                if(resp.username) {
+                    setUsername(resp.username);
+                    if(resp.motto)
+                        setMotto(resp.motto)
+                } else {
+                    navigate('/')
                 }
+            } else {
+                navigate('/')
             }
         };
   
@@ -59,26 +61,18 @@ function Profile() {
         const token = localStorage.getItem("token");
         if (token) {
             try {
-                const response = await fetch("http://localhost:3002/logout", {
-                    method: "GET",  // Adjust method based on your server implementation
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (response.ok) {
+                const resp = await APIService.request('/logout', 'GET', null, true);
+                if(resp.status == 200) {
                     localStorage.removeItem("token");
-                    console.log("Logged out successfully");
-                    navigate("/login");
+                    alert("Logged out successfully");
+                    navigate('/');
                 } else {
-                    console.error("Failed to logout:", response.statusText);
+                    console.error("Failed to logout:")
                 }
-            } catch (error) {
-                console.error("Error:", error);
+            } catch(error: any) {
+                console.error("Failed to logout")
             }
-        } else {
-            console.log("No token found");
-            navigate("/login");
-        }
+        } 
     };
 
     const stopRecording = async () => {
@@ -90,7 +84,7 @@ function Profile() {
             const formData = new FormData();
             formData.append('audio', blob);
             formData.append('username', username); 
-    
+            
             try {
                 const response = await fetch('http://localhost:3002/upload', {
                     method: 'POST',
@@ -99,8 +93,13 @@ function Profile() {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 });
+                // const response = await APIService.request('/upload', 'POST', formData)
                 if (response.ok) {
-                    console.log('Audio uploaded successfully');
+                    const data = await response.json();
+                    if(data) {
+                        setMotto(data.data)
+                    }
+                    alert('Audio uploaded successfully');
                 } else {
                     console.error('Failed to upload audio:', response.statusText);
                 }
@@ -124,7 +123,7 @@ function Profile() {
                 </Typography>
             </Box>
             <Typography variant="h5" component="div" sx={{ my: 4 }}>
-                "My motto goes here!"
+                {motto}
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Button variant="contained" color="success" sx={{ width: '45%' }} onClick={startRecording}>

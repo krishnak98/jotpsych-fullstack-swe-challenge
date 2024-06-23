@@ -5,8 +5,8 @@ class APIService {
 
   private constructor() {
     this.baseUrl = "http://localhost:3002";
-    this.appVersion = "1.0.0";
-  }
+    this.appVersion = "1.3.0"; // testing later version
+  } 
 
   public static getInstance(): APIService {
     if (!APIService.instance) {
@@ -25,13 +25,9 @@ class APIService {
       "Content-Type": "application/json",
       "app-version": this.appVersion,
     };
-    console.log("inside request")
-    console.log(auth)
     if (auth) {
-      console.log("Inside auth")
       // get access token somehow
       var token = localStorage.getItem('token')
-      console.log(token)
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
@@ -41,6 +37,7 @@ class APIService {
       method,
       headers,
       body: body ? JSON.stringify(body) : null,
+      credentials: 'include',
     });
 
     if (!response.ok) {

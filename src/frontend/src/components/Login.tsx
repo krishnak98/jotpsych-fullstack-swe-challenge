@@ -5,32 +5,12 @@ import { useNavigate } from 'react-router-dom';
 
 
 
-// add redirection on sucessful login
 
 function Login() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [message, setMessage] = useState<string>("");
 
-  // const handleLogin = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   const response = await fetch("http://localhost:3002/login", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ username, password }),
-  //   });
-  //   const data = await response.json();
-  //   if (response.ok) {
-  //     // do something with access token
-  //     localStorage.setItem('token', data.token)
-
-  //     setMessage("Login successful");
-  //   } else {
-  //     setMessage(data.message);
-  //   }
-  // };
 
   const navigate = useNavigate();
 
@@ -38,11 +18,14 @@ function Login() {
     e.preventDefault();
     try {
       const data = await APIService.request('/login', 'POST', { username, password });
-      
-      localStorage.setItem('token', data.token);
+      if(data.token) {
+        localStorage.setItem('token', data.token);
   
-      setMessage("Login successful");
-      navigate('/profile');
+        setMessage("Login successful");
+        navigate('/profile');
+      } else {
+        setMessage(data.message)
+      }
   
     } catch (error: any) {
       setMessage(error.message || "An error occurred");

@@ -8,30 +8,18 @@ function Register() {
   const [password, setPassword] = useState<string>("");
   const [message, setMessage] = useState<string>("");
 
-  // const handleRegister = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   const response = await fetch("http://localhost:3002/register", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ username, password }),
-  //   });
-  //   const data = await response.json();
-  //   setMessage(data.message);
-  //   if data
-  // };
 
   const navigate = useNavigate();
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const resp = await APIService.request('/register', 'POST', { username, password });
+      console.log(resp)
       if (resp.status === 201) {
         setMessage("Registration successful");
         navigate('/login');
       } else {
-        setMessage("Failed to register user");
+        setMessage("Failed to register user " + resp.message);
       }
 
   

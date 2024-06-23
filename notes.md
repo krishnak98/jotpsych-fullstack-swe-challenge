@@ -17,7 +17,13 @@ In app.py, I just created a VERY BASIC dummy function which transcribes the audi
 
 
 ------------------------------------
-This is after the submission.
+This is after the deadline. You can use commit msg "coding challenge commit 1" as the submission
 
 # Update 1: 
 updated register to use APIService; and added routes from register to login, login to profile, profile to logout
+
+# Update 2: 
+Changed to APIService calls.
+
+# Update 3: 
+Minor improvements, added motto to the db, updated user profile to display self recorded audio
