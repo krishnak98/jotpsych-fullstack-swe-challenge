@@ -122,9 +122,7 @@ def create_app():
         data = request.files['audio']
         username = request.form['username']
         transcript = transcribe_audio(data)
-        print(transcript)
         enc_transcript = cipher.encrypt(transcript.encode('utf-8'))
-        print(enc_transcript)
         user = User.query.filter_by(username=username).first()
         user.motto = enc_transcript
         db.session.commit()

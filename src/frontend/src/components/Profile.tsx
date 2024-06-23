@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Container, Typography, Box, Button, Avatar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import APIService from "../services/APIService";
+import AudioRecorder from "./AudioRecorder";
 
 function Profile() {
     const [username, setUsername] = useState<string>("");
@@ -29,34 +30,6 @@ function Profile() {
     }, []);
 
 
-
-    const [isRecording, setIsRecording] = useState(false);
-    const [audioUrl, setAudioUrl] = useState(null);
-    const mediaRecorder = useRef(null);
-    const chunks = useRef([]);
-
-    const startRecording = () => {
-        if (isRecording) {
-            stopRecording();
-        } else {
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    mediaRecorder.current = new MediaRecorder(stream);
-                    mediaRecorder.current.ondataavailable = e => {
-                        if (e.data.size > 0) {
-                            chunks.current.push(e.data);
-                        }
-                    };
-                    mediaRecorder.current.start();
-                    setIsRecording(true);
-                    setTimeout(stopRecording, 15000); // 15 seconds
-                })
-                .catch(err => console.error('Error accessing microphone:', err));
-        }
-    };
-
-
-
     const handleLogout = async () => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -75,44 +48,6 @@ function Profile() {
         } 
     };
 
-    const stopRecording = async () => {
-        if (mediaRecorder.current && isRecording) {
-            mediaRecorder.current.stop();
-            setIsRecording(false);
-            const blob = new Blob(chunks.current, { type: 'audio/webm' });
-    
-            const formData = new FormData();
-            formData.append('audio', blob);
-            formData.append('username', username); 
-            
-            try {
-                const response = await fetch('http://localhost:3002/upload', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                });
-                // const response = await APIService.request('/upload', 'POST', formData)
-                if (response.ok) {
-                    const data = await response.json();
-                    if(data) {
-                        setMotto(data.data)
-                    }
-                    alert('Audio uploaded successfully');
-                } else {
-                    console.error('Failed to upload audio:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error uploading audio:', error);
-            }
-    
-            setAudioUrl(URL.createObjectURL(blob));
-            chunks.current = [];
-        }
-    };
-    
-    
 
     return (
         <Container maxWidth="sm" sx={{ textAlign: 'center', mt: 4, border: 1, borderRadius: 2, p: 2 }}>
@@ -126,9 +61,7 @@ function Profile() {
                 {motto}
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button variant="contained" color="success" sx={{ width: '45%' }} onClick={startRecording}>
-                    Record (New) Motto
-                </Button>
+                <AudioRecorder username={username} setMotto={setMotto} />
                 <Button variant="contained" color="error" sx={{ width: '45%' }} onClick={handleLogout}>
                     Logout
                 </Button>

@@ -23,11 +23,15 @@ This is after the deadline. You can use commit msg "coding challenge commit 1" a
 updated register to use APIService; and added routes from register to login, login to profile, profile to logout
 
 # Update 2: 
-Changed to APIService calls.
+Changed to APIService calls. Checks for app version have been added. The upload endpoint is giving me some CORS issue, so that's still using the old fetch() routine
 
 # Update 3: 
 Minor improvements, added motto to the db, updated user profile to display self recorded audio
 Upload is still causing some CORS issue, so haven't used APIService for /upload endpoint
-Encryption and decryption of user's motto is complete. 
+Encryption and decryption of user's motto is complete, I used the cryptography module, and updated it in the requirements.txt
 I'm hardcoding a key, so that key is same across server restarts. Need to think of a better method for this.
+
+# Update 4:
+
+Moved AudioRecorder parts to different typescript file
 
